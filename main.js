@@ -16,7 +16,7 @@ const renderer = new UnlitRenderer(canvas);
 await renderer.initialize();
 
 const gltfLoader = new GLTFLoader();
-await gltfLoader.load(new URL('./models/monkey/monkey.gltf', import.meta.url)); // primer
+await gltfLoader.load(new URL('./game/models/map/map.gltf', import.meta.url)); // primer
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 const camera = scene.find(node => node.getComponentOfType(Camera));
