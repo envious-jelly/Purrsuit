@@ -1,6 +1,7 @@
 import { vec3, mat4 } from 'glm';
 import { getGlobalModelMatrix } from 'engine/core/SceneUtils.js';
 import { Transform } from 'engine/core/core.js';
+import { Model } from 'engine/core/Model.js';
 
 export class Physics {
 
@@ -8,16 +9,32 @@ export class Physics {
         this.scene = scene;
     }
 
-    update(t, dt) {
+    update(t, dt, levelBounds) {
         for (const entity of this.scene) {
             if (entity.customProperties?.isDynamic) {
                 for (const other of this.scene) {
                     if (entity !== other && other.customProperties?.isStatic) {
+                        if(other.customProperties?.isFence) continue; // skip fence (we're hard checking the perimiter instead)
                         this.resolveCollision(entity, other);
                     }
                 }
             }
+
+            if (entity.customProperties?.isPlayer && levelBounds != null) {
+                this.keepPlayerInBounds(entity, levelBounds, 0.2);
+            }
         }
+    }
+
+    keepPlayerInBounds(player, bounds, offset = 0.1) {
+        const transform = player.getComponentOfType(Transform);
+        if (!transform) return;
+
+        // Clamp each axis to stay inside bounds with a small offset
+        transform.translation[0] = Math.min(Math.max(transform.translation[0], bounds.min[0] + offset), bounds.max[0] - offset);
+        // the middle value is height - don't change it
+        //transform.translation[1] = Math.min(Math.max(transform.translation[1], bounds.min[1] + offset), bounds.max[1] - offset);
+        transform.translation[2] = Math.min(Math.max(transform.translation[2], bounds.min[2] + offset), bounds.max[2] - offset);
     }
 
     intervalIntersection(min1, max1, min2, max2) {
@@ -31,6 +48,8 @@ export class Physics {
     }
 
     getTransformedAABB(entity) {
+        if (!entity.aabb) return null;
+        
         // Transform all vertices of the AABB from local to global space.
         const matrix = getGlobalModelMatrix(entity);
         const { min, max } = entity.aabb;
