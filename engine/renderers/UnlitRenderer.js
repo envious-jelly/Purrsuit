@@ -168,7 +168,7 @@ export class UnlitRenderer extends BaseRenderer {
         const baseTexture = this.prepareTexture(material.baseTexture);
 
         const materialUniformBuffer = this.device.createBuffer({
-            size: 32, //16
+            size: 32,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
