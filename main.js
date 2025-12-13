@@ -8,6 +8,7 @@ import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
 import { FirstPersonController } from 'engine/controllers/FirstPersonController.js';
 import { Parent } from 'engine/core/Parent.js';
 import { Physics } from './Physics.js';
+import { BurleyLight } from './BurleyLight.js';
 
 import {
     Camera,
@@ -70,6 +71,16 @@ for (const entity of scene) {
 // park bounds (fence)
 const fencePerimeter = computeFencePerimeter(scene);
 
+// add light
+const light = new Entity();
+light.addComponent(new Transform({
+    translation: [0, 2, 2],
+}));
+light.addComponent(new BurleyLight({
+    intensity: 3,
+}));
+scene.push(light);
+
 function update(time, dt) {
     for (const entity of scene) {
         for (const component of entity.components) {
@@ -130,4 +141,3 @@ function computeFencePerimeter(scene) {
 
     return { min, max };
 }
-
