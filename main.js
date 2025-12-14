@@ -74,7 +74,7 @@ const fencePerimeter = computeFencePerimeter(scene);
 // add light
 const light = new Entity();
 light.addComponent(new Transform({
-    translation: [0, 2, 2],
+    translation: [6.2211079597473145, 3, 4.393091678619385],
 }));
 light.addComponent(new BurleyLight({
     intensity: 3,
