@@ -8,6 +8,7 @@ import { UnlitRenderer } from 'engine/renderers/UnlitRenderer.js';
 import { FirstPersonController } from 'engine/controllers/FirstPersonController.js';
 import { Parent } from 'engine/core/Parent.js';
 import { Physics } from './Physics.js';
+import { BurleyLight } from './BurleyLight.js';
 import { CatSpawner } from './catSpawner.js';
 import { createCat } from './catFactory.js';
 
@@ -82,6 +83,16 @@ for (const entity of scene) {
 // park bounds (fence)
 const fencePerimeter = computeFencePerimeter(scene);
 
+// add light
+const light = new Entity();
+light.addComponent(new Transform({
+    translation: [6.2211079597473145, 3, 4.393091678619385],
+}));
+light.addComponent(new BurleyLight({
+    intensity: 3,
+}));
+scene.push(light);
+
 function update(time, dt) {
     for (const entity of scene) {
         for (const component of entity.components) {
@@ -142,7 +153,6 @@ function computeFencePerimeter(scene) {
 
     return { min, max };
 }
-
 async function loadCatPrefab(gltfUrl, nodeName) {
   const loader = new GLTFLoader();
   await loader.load(new URL(gltfUrl, import.meta.url));

@@ -1,4 +1,4 @@
-import { mat4 } from 'glm';
+import { vec3, mat4 } from 'glm';
 
 import * as WebGPU from '../WebGPU.js';
 
@@ -13,8 +13,10 @@ import {
 
 import { BaseRenderer } from './BaseRenderer.js';
 
+import { BurleyLight } from '../../BurleyLight.js';
+
 const vertexBufferLayout = {
-    arrayStride: 20,
+    arrayStride: 48,
     attributes: [
         {
             name: 'position',
@@ -27,6 +29,12 @@ const vertexBufferLayout = {
             shaderLocation: 1,
             offset: 12,
             format: 'float32x2',
+        },
+        {
+            name: 'normal',
+            shaderLocation: 2,
+            offset: 20,
+            format: 'float32x3',
         },
     ],
 };
@@ -101,7 +109,7 @@ export class UnlitRenderer extends BaseRenderer {
         }
 
         const cameraUniformBuffer = this.device.createBuffer({
-            size: 128,
+            size: 144,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -114,6 +122,28 @@ export class UnlitRenderer extends BaseRenderer {
 
         const gpuObjects = { cameraUniformBuffer, cameraBindGroup };
         this.gpuObjects.set(camera, gpuObjects);
+        return gpuObjects;
+    }
+
+    prepareLight(light) {
+        if (this.gpuObjects.has(light)) {
+            return this.gpuObjects.get(light);
+        }
+
+        const lightUniformBuffer = this.device.createBuffer({
+            size: 48,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
+        const lightBindGroup = this.device.createBindGroup({
+            layout: this.pipeline.getBindGroupLayout(3),
+            entries: [
+                { binding: 0, resource: lightUniformBuffer },
+            ],
+        });
+
+        const gpuObjects = { lightUniformBuffer, lightBindGroup };
+        this.gpuObjects.set(light, gpuObjects);
         return gpuObjects;
     }
 
@@ -138,7 +168,7 @@ export class UnlitRenderer extends BaseRenderer {
         const baseTexture = this.prepareTexture(material.baseTexture);
 
         const materialUniformBuffer = this.device.createBuffer({
-            size: 16,
+            size: 32,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -156,7 +186,7 @@ export class UnlitRenderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    render(entities, camera) {
+    render(scene, camera) {
         if (this.depthTexture.width !== this.canvas.width || this.depthTexture.height !== this.canvas.height) {
             this.recreateDepthTexture();
         }
@@ -183,12 +213,25 @@ export class UnlitRenderer extends BaseRenderer {
         const cameraComponent = camera.getComponentOfType(Camera);
         const viewMatrix = getGlobalViewMatrix(camera);
         const projectionMatrix = getProjectionMatrix(camera);
+        const cameraPosition = mat4.getTranslation(vec3.create(), getGlobalModelMatrix(camera));
         const { cameraUniformBuffer, cameraBindGroup } = this.prepareCamera(cameraComponent);
         this.device.queue.writeBuffer(cameraUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
+        this.device.queue.writeBuffer(cameraUniformBuffer, 128, cameraPosition);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
-        for (const entity of entities) {
+        const light = scene.find(entity => entity.getComponentOfType(BurleyLight));
+        const lightComponent = light.getComponentOfType(BurleyLight);
+        const lightColor = vec3.scale(vec3.create(), lightComponent.color,lightComponent.intensity / 255);
+        const lightPosition = mat4.getTranslation(vec3.create(),getGlobalModelMatrix(light));
+        const lightAttenuation = vec3.clone(lightComponent.attenuation);
+        const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
+        this.device.queue.writeBuffer(lightUniformBuffer, 0, lightColor);
+        this.device.queue.writeBuffer(lightUniformBuffer, 16,lightPosition);
+        this.device.queue.writeBuffer(lightUniformBuffer, 32,lightAttenuation);
+        this.renderPass.setBindGroup(3, lightBindGroup);
+
+        for (const entity of scene) {
             this.renderEntity(entity);
         }
 
@@ -217,8 +260,13 @@ export class UnlitRenderer extends BaseRenderer {
     }
 
     renderPrimitive(primitive) {
+        const material = primitive.material;
         const { materialUniformBuffer, materialBindGroup } = this.prepareMaterial(primitive.material);
-        this.device.queue.writeBuffer(materialUniformBuffer, 0, new Float32Array(primitive.material.baseFactor));
+        this.device.queue.writeBuffer(materialUniformBuffer, 0, new Float32Array([
+            ...material.baseFactor,
+            material.metalnessFactor,
+            material.roughnessFactor,
+        ]));
         this.renderPass.setBindGroup(2, materialBindGroup);
 
         const { vertexBuffer, indexBuffer } = this.prepareMesh(primitive.mesh, vertexBufferLayout);
