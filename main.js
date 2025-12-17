@@ -66,7 +66,7 @@ const catPrefab = await loadCatPrefab('./game/models/cat/cat.gltf', 'Cat');
 //Spawn cats from markers
 spawnCatsFromMarkers(scene, catPrefab, {
   markerPrefix: 'SPAWN_CAT_',
-  count: 21,  // stevilo mack k se jih spawna
+  count: 10,  // stevilo mack k se jih spawna
   minDistance: 1.2,
 });
 
@@ -285,6 +285,6 @@ function spawnCatsFromMarkers(scene, catPrefab, { markerPrefix, count, minDistan
     );
   });
 
-  //console.log('Scene entity count after spawning:', scene.length);
-  //console.log('Cats in entitiesByName:', [...scene.entitiesByName.keys()].filter(k => k.startsWith('Cat_')));
+  console.log('Scene entity count after spawning:', scene.length);
+  console.log('Cats in entitiesByName:', [...scene.entitiesByName.keys()].filter(k => k.startsWith('Cat_')));
 }
