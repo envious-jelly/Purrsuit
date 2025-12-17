@@ -47,16 +47,13 @@ const boltScene = boltLoader.loadScene(boltLoader.defaultScene);
 
 const bolt = boltScene.getEntityByName("Bolt");
 
-// Make the bolt material emissive and transparent
+// make the bolt emissive
 const boltModel = bolt.getComponentOfType(Model);
 if (boltModel) {
     for (const primitive of boltModel.primitives) {
         if (primitive.material) {
-            // Set the bolt to be semi-transparent
-            primitive.material.baseFactor[3] = 0.3;  // Alpha/transparency (0-1, lower = more transparent)
-            // Make it glow with emissive yellow light
-            primitive.material.emissiveFactor = 2.0;  // Increase for brighter glow
-            primitive.material.emissiveColor = [1, 1, 1];  // Yellow color (normalize 247/255, 201/255, 10/255)
+            primitive.material.emissiveFactor = 0.5;  // kok mocno glowa bolt
+            primitive.material.emissiveColor = [1, 1, 1];
         }
     }
 }
