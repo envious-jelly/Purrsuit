@@ -110,11 +110,9 @@ for (const source of lightSources) {
     let light = new Entity();
     scene.push(light);
     light.addComponent(new Transform({
-        translation: [source[1].components[0].translation[0], 3, source[1].components[0].translation[2]]
+        translation: [source[1].components[0].translation[0], 3.65, source[1].components[0].translation[2]]
     }));
-    light.addComponent(new BurleyLight({
-        intensity: 1,
-    }));
+    light.addComponent(new BurleyLight());
     //flickering za eno luc
     if (source[0] === "Light_source") {
         light.addComponent({
@@ -143,8 +141,8 @@ boltLight.addComponent(new Transform({
     translation: [boltTranslation[0], 1.2, boltTranslation[2]]
 }));
 boltLight.addComponent(new BurleyLight({
-    intensity: 1,
-    color: [247, 201, 10]
+    color: [247, 201, 10],
+    type: 1,
 }));
 
 
