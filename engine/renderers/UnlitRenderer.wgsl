@@ -195,9 +195,9 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let dist = distance(camera.position, surfacePosition);
     const e = 2.71828;
     var fogDensity = dist/250; // vecji deljitelj pomeni less thick fog
-    let f = 1/pow(pow(e, fogDensity*dist), 2); // IF U DONT WANT FOG replace fogDensity with 0
+    let f = 1/pow(pow(e, fogDensity*dist), 2);
     const fogColor = vec3f(0.05, 0.06, 0.08);
-    finalColor = lerp_vec3f(fogColor, finalColor, f);
+    finalColor = lerp_vec3f(fogColor, finalColor, f); // IF U DONT WANT FOG zakomentirej to vrstico
 
     output.color = vec4f(linearTosRGB(finalColor), baseColor.a);
 
