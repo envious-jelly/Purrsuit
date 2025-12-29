@@ -15,6 +15,7 @@ export class FirstPersonController {
     } = {}) {
         this.entity = entity;
         this.domElement = domElement;
+        this.enabled = false;  // Start disabled, will be enabled after menu closes
 
         this.pitch = pitch;
         this.yaw = yaw;
@@ -67,6 +68,11 @@ export class FirstPersonController {
     }
 
     update(t, dt) {
+        // Skip input handling if controller is disabled
+        if (!this.enabled) {
+            return;
+        }
+
         // Calculate forward and right vectors.
         const cos = Math.cos(this.yaw);
         const sin = Math.sin(this.yaw);
@@ -122,6 +128,11 @@ export class FirstPersonController {
     }
 
     pointermoveHandler(e) {
+        // Skip if controller is disabled
+        if (!this.enabled) {
+            return;
+        }
+
         const dx = e.movementX;
         const dy = e.movementY;
 
