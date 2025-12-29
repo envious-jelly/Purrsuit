@@ -2,7 +2,7 @@ export class BurleyLight {
 
     constructor({
         color = [255, 255, 255],
-        intensity = 1,
+        intensity = 0.7,
         attenuation = [0.001, 0, 0.3],
         direction = [0, -1, 0],
         type = 0,

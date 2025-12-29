@@ -237,6 +237,7 @@ export class UnlitRenderer extends BaseRenderer {
             const lightAttenuation = vec3.clone(lightComponent.attenuation);
             const lightDirection = vec3.clone(lightComponent.direction);
             const lightType = lightComponent.type;
+            //console.log(lightType, lightColor);
 
             lightData.set(lightColor, offset);
             lightData.set(lightPosition, offset + 4);

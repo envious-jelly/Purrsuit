@@ -153,13 +153,13 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
         var lightColor = light.color;
 
-        if (light.ltype == 0) {
+        if (light.color[0] > 1) {
             let dir = normalize(light.direction);
-            let ifLit = dot(-L, dir);
-            let angle = cos(0.7);
+            let LdotDir = dot(-L, dir);
+            let angle = cos(0.5); // snop spotlighta
             var Af = 0.0;
-            if (ifLit > angle) {
-                Af = smoothstep(angle, 1.0, ifLit);
+            if (LdotDir > angle) {
+                Af = smoothstep(angle, 1.0, LdotDir);
             }
             lightColor = attenuation * light.color * Af; // Il
             
@@ -184,7 +184,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     finalColor += emissive;
     
     output.color = vec4f(linearTosRGB(finalColor), baseColor.a);
-    output.color += vec4f(baseColor.rgb * 0.1, output.color.a);
+    output.color += vec4f(baseColor.rgb * 0.05, output.color.a);
 
     return output;
 }
