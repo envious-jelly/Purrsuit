@@ -254,14 +254,16 @@ function timer() {
     time -= 1000; // -1sec
     if (time <= 0) {
         time = 0;
-        // disable controls
-        const controller = camera.getComponentOfType(FirstPersonController);
-        if (controller) {
-            controller.enabled = false;
-        }
         clearInterval(timerIntervalID); // disable timer
     }
     scene.updateHUD();
+}
+
+function disableControls() {
+    const controller = camera.getComponentOfType(FirstPersonController);
+    if (controller) {
+        controller.enabled = false;
+    }
 }
 
 document.addEventListener('keydown', (e) => {
@@ -278,10 +280,12 @@ scene.updateHUD = () => {
     document.getElementById("score").textContent = "Cats Left: " + (NUM_OF_CATS - scene.numOfCatsCollected);
     if (NUM_OF_CATS - scene.numOfCatsCollected <= 0) {
         scene.HUDMessage = "You win!";
+        disableControls();
         // or a win screen
     }
     else if (time <= 0) {
         scene.HUDMessage = "You're out of time!";
+        disableControls();
         // lose screen
     }
 
