@@ -12,6 +12,7 @@ import { BurleyLight } from './BurleyLight.js';
 import { CatSpawner } from './CatSpawner.js';
 import { createCat } from './CatFactory.js';
 import { PetHandAnimator } from './PetHandAnimator.js';
+import { SpinAnimator } from './SpinAnimator.js';
 
 import {
     Camera,
@@ -88,6 +89,10 @@ if (boltModel) {
         }
     }
 }
+bolt.addComponent(new SpinAnimator(bolt, {
+  axis: [0, 1, 0], // spin around Y
+  speed: 2.0,     // faster spin
+}));
 
 scene.push(bolt);
 bolt.name = "Bolt";
