@@ -255,7 +255,7 @@ document.getElementById("playButton").addEventListener('click', (e) => {
 
 });
 
-const maxTime = 1.1 * 60 * 1000;
+const maxTime = 1 * 60 * 1000;
 var time = maxTime;
 function timer() {
     time -= 1000; // -1sec
