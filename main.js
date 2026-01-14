@@ -245,9 +245,17 @@ new ResizeSystem({ canvas, resize }).start();
 new UpdateSystem({ update, render }).start();
 
 var timerIntervalID = null;
+var gameStarted = false;
 // interaction
 document.getElementById("playButton").addEventListener('click', (e) => {
+    // prevent multiple clicks from starting multiple timers
+    if (gameStarted) return;
+    gameStarted = true;
+    
     // timer
+    if (timerIntervalID !== null) {
+        clearInterval(timerIntervalID);
+    }
     timerIntervalID = setInterval(timer, 1000);
 
     document.getElementById("hud").classList = "";
